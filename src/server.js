@@ -21,9 +21,22 @@ app.get("/products", async (req, res) => {
 
 app.get("/products/:id", async (req, res) => {
     let id = parseInt(req.params.id);
-    let allProducts = await readProducts;
-    let productsById = allProducts.find(product => product.id === id)
-    res.send(productsById)
+    if(isNaN(id)) {
+        return res.status(400).send('ID inválido');
+    }
+    try {
+        let product = await pm.getProductsById(id);
+        if (!product) {
+            return res.status(404).send("Producto no encontrado");
+        }
+        res.json(product); // Devuelve el producto encontrado
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).send('Error al recuperar el producto');
+
+    }
+
 });
 
 const PORT = 8080;
